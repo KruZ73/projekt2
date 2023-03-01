@@ -1,1 +1,3 @@
-/vendor/
+vendor/
+pub/sandbox/img/
+img/index.php/
