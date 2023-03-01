@@ -1,6 +1,51 @@
 <?php
 class Post {
-    static function upload(string $tempFileName) {
+    private string $title;
+    private string $imageUrl;
+    private string $timeStamp;
+
+    function __construct(string $title, string $imageUrl, string $timeStamp) {
+        $this->title = $title;
+        $this->imageUrl = $imageUrl;
+        $this->timeStamp = $timeStamp;
+    }
+    
+        
+    
+
+    static function get(int $id) : Post {
+        global $db;
+        $query = $db->prepare("SELECT * FROM images WHERE id = ?");
+        $query->blind_param('i', $id);
+        $query->execute();
+        $result = $query->get_result();
+        $resultArray = $result->fetch_assoc();
+        return new Post($resultArray['title'],
+                        $resultArray['filename'],
+                        $resultArray['timestamp']);
+    }
+
+
+    static function getPage(int $pageNumber = 1, int $postPerPage = 10) {
+        global $db;
+        $query = $db->prepare("SELECT * FROM images LIMIT ? OFFSET ?");
+        $offset = ($pageNumber-1) * $postPerPage;
+        $query->bind_param('ii', $postPerPage, $offset);
+        $query->execute();
+        $result = $query->get_result();
+        $postArray = array();
+        while($row = $result->fetch_assoc()) {
+            $post = new Post($row['title'],
+                            $row['filename'],
+                            $row['timestamp']);
+            array_push($postsArray);
+        }
+        return $postArray;
+    }
+
+
+
+    static function upload(string $tempFileName, string $title = "") {
         //funkcja działa bez tworzenia instancji obiektu
         // uwaga wywołanie metodą Post::upload()
         $uploadDir = "img/";
@@ -27,6 +72,18 @@ class Post {
         $gdImage = @imagecreatefromstring($imageString);
         //zapisz plik do docelowej lokalizacji
         imagewebp($gdImage, $targetFileName);
+
+        global $db;
+
+        $query = $db->prepare("INSERT INTO post VALUES(NULL, ?, ?, ?)");
+
+        $dbTimestamp = date("Y-m-d H:i:s");
+
+        $query->bind_param("sss", $dbTimestamp, $targetFileName, $title);
+
+        if(!$query->execute())
+            die("Błąd zapisu do bazy danych");
+
     }
 }
 

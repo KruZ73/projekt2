@@ -1,6 +1,6 @@
 <?php
-$db = new mysqli('localhost', 'root', '', 'img')
-
+$db = new mysqli('localhost', 'root', '', 'img');
+require('./../src/Post.class.php');
 
 
 ?>
