@@ -1,6 +1,7 @@
 {
     "name": "1183657/projekt2",
     "require": {
-        "steampixel/simple-php-router": "^0.7.1"
+        "steampixel/simple-php-router": "^0.7.1",
+        "twig/twig": "^3.5"
     }
 }
