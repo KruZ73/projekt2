@@ -1,6 +1,11 @@
 <?php
-$db = new mysqli('localhost', 'root', '', 'img');
-require('./../src/Post.class.php');
+
+require("./../vendor/autoload.php");
+
+$db = new mysqli("localhost", "root", "", "img");
+require("Post.class.php");
+
+
 
 
 ?>

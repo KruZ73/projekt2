@@ -1,0 +1,10 @@
+DirectoryIndex index.php
+
+RewriteEngine on
+
+RewriteBase /projekt2/pub
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-f
+
+RewriteRule ^(.*)$ index.php [QSA]
