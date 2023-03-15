@@ -1,9 +1,10 @@
 <?php
 
 require("./../vendor/autoload.php");
+require('./../src/Post.class.php');
 
 $db = new mysqli("localhost", "root", "", "img");
-require("Post.class.php");
+
 
 $loader = new Twig\Loader\FilesystemLoader('./../src/templates');
 

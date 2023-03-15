@@ -3,11 +3,34 @@ class Post {
     private int $id;
     private string $filename;
     private string $timestamp;
+    private string $title;
 
-    function __construct(int $i, string $f, string $t) {
+    function __construct(int $i, string $f, string $t, string $title) {
         $this->id = $i;
         $this->filename = $f;
         $this->timestamp = $t;
+        $this->title = $title;
+    }
+
+    // gettery
+
+    public function getFilename() : string {
+        return $this->filename;
+    }
+
+    public function getTitle() {
+        return $this->title;
+    }
+
+    static function get(int $id) : Post {
+        global $db;
+
+        $q = $db->prepare("SELECT * FROM images WHERE id = ?");
+        $q->bind_param('i', $id);
+        $q->execute();
+        $result = $q->get_result();
+        $resultArray = $result->fetch_array();
+        return new Post($resultArray['title'], $resultArray['filename'], $result['timestamp'], $resultArray['id']);
     }
 
     
@@ -19,7 +42,7 @@ class Post {
         $query->execute();
         $result = $query->get_result();
         $row = $result->fetch_assoc();
-        $p = new Post($row['id'], $row['filename'], $row['timestamp']);
+        $p = new Post($row['id'], $row['filename'], $row['timestamp'], $row['title']);
         return $p; 
     }
 
@@ -28,14 +51,14 @@ class Post {
 
         global $db;
 
-        $query = $db->prepare("SELECT * FROM post ORDER BY timestamp DESC LIMIT ? OFFSET ?");
-        $offset = ($pageNumber-1)*$postsPerPage;
+        $query = $db->prepare("SELECT * FROM images ORDER BY timestamp DESC LIMIT ? OFFSET ?");
+        $offset = ($pageNumber-1) * $postsPerPage;
         $query->bind_param('ii', $postsPerPage, $offset);
         $query->execute();
         $result = $query->get_result();
         $postsArray = array();
         while($row = $result->fetch_assoc()) {
-            $post = new Post($row['id'],$row['filename'],$row['timestamp']);
+            $post = new Post($row['id'], $row['filename'], $row['timestamp'], $row['title']);
             array_push($postsArray, $post);
         }
         return $postsArray;
@@ -63,12 +86,17 @@ class Post {
         imagewebp($gdImage, $newFileName);
 
         global $db;
-        $query = $db->prepare("INSERT INTO post VALUES(NULL, ?, ?)");
-        $dbTimestamp = date("Y-m-d H:i:s");
-        $query->bind_param("ss", $dbTimestamp, $newFileName);
-        if(!$query->execute())
-            die("Błąd zapisu do bazy danych");
 
+        $query = "INSERT images (id, timestamp, filename, title) VALUES (NULL, ?, ?, ?)";
+        $preparedQ = $db->prepare($query);
+
+        $date = date('Y-m-d H:i:s');
+        $preparedQ->bind_param('sss', $date, $newFileName, $title);
+        $result = $preparedQ->execute();
+        
+        //if (!$result) {
+        //    die("Błąd bazy danych");
+        //}
     }
 }
 
@@ -78,7 +106,17 @@ class Post {
 
 
 
-/*
+    /*
+
+    //global $db;
+        //$query = $db->prepare("INSERT INTO images VALUES(NULL, ?, ?, ?)");
+        //$dbTimestamp = date("Y-m-d H:i:s");
+        //$query->bind_param("sss", $dbTimestamp, $newFileName, $title);
+        //if(!$query->execute())
+        //    die("Błąd zapisu do bazy danych");
+
+
+
     private string $title;
     private string $imageUrl;
     private string $timeStamp;
@@ -179,7 +217,8 @@ class Post {
         if(!$query->execute())
             die("Błąd zapisu do bazy danych");
 
-    } */
+    } 
+    */
 
 
 ?>
