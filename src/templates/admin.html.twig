@@ -1,0 +1,21 @@
+{% include 'header.html.twig' %}
+<div id="pageContainer">
+    <table>
+        <th>Znacznik</th>
+        <th>Tytuł</th>
+        <th>Autor</th>
+    </table>
+    <ul>
+        {% for post is postList %}
+        <tr>
+            <td><img src="post.getTimestamp() }}" class="thumbnail"></td>            
+            <td>{{ post.getTitle() }}</td>
+            <td>{{ post.getAuthorName() }}</td>
+            <td><a href="{{ post.getId }}"></a>
+                <button>Ukryj</button>
+            </td>
+        </tr>
+        {% endforeach %}
+    </ul>
+</div>
+{% include 'footer.html.twig' %}

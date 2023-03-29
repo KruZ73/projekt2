@@ -1,38 +1,19 @@
-{%include 'header.html.twig'%}
-<h1>Strona Główna</h1>
-<a href="upload">Wgraj mema</a>
-<br><br>
-{% for post in posts %}
-
-<div>
-    <button type='button' class='comment'>
-        💬
-    </button> 
-    <div>
-        <button type='button'>▲</button>
-        <div>69</div>
-        <button type='button'>▼</button>
-        
+{% include 'header.html.twig' %}
+<div id="pageContainer">
+    <h1>{{pageTitle}}</h1>
+    {# jeśli użytkownik jest zalogowany to pokaż #}
+    {% if user is defined %}
+    <div id="loggedUser">Zalogowany użytkownik: {{ user.getName() }} </div>
+    {% endif %}
+    {% for post in postArray %}
+    <div id="post">
+        <h2>{{ post.getTitle() }} </h2>
+        <img src="{{ post.getFilename() }}">
+        <h6>Autor: {{post.getAuthorName() }}</h6>
+        <h6>Data dodania: {{ post.getTimestamp() }} </h6>
     </div>
-    <div>
-        <h2>{{ post.getTitle() }}</h2>
-        {{ post.getTimestamp() }}<br>
-    </div>
-<img class='img' src="{{ post.getFilename() }}"><br></div>
-{% endfor %}
-
-{%include 'footer.html.twig'%}
+    {% endfor %}
+</div>
 
 
-
-
-
-
-<!-- 
-    {% include 'header.html.twig' %}
-<h1>Strona główna</h1>
-{% for post in posts %}
-<img src="" post.getFilename() }}>
-{% endfor %}
 {% include 'footer.html.twig' %}
--->
