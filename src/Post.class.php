@@ -103,7 +103,12 @@ class Post {
         $imageString = file_get_contents($tempFileName);
         //generujemy obraz jako obiekt klasy GDImage
         //@ przed nazwa funkcji powoduje zignorowanie ostrzeżeń
+
+
+        // błąd tu jest jakiś?????
         $gdImage = @imagecreatefromstring($imageString);
+        
+        
         //zapisujemy w formacie webp
         imagewebp($gdImage, $newFileName);
 
