@@ -122,7 +122,12 @@ class Post {
 
     public static function delete(int $id) : bool {
         global $db;
-        $query = $db;
+        $query = $db->prepare("UPDATE post SET removed = true WHERE id = ?");
+        $query->bind_param('i', $id);
+        if($query->execute())
+            return true;
+        else
+            return false;
     }
 }
 
