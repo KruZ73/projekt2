@@ -1,21 +1,24 @@
 {% include 'header.html.twig' %}
 <div id="pageContainer">
     <table>
-        <th>Znacznik</th>
+    <tr>
+        <th>Miniatura</th>
+        <th>Znacznik czasu</th>
         <th>Tytuł</th>
         <th>Autor</th>
-    </table>
-    <ul>
-        {% for post is postList %}
+        <th>Ban</th>
+    </tr>
+    {% for post in postList %}
         <tr>
-            <td><img src="post.getTimestamp() }}" class="thumbnail"></td>            
-            <td>{{ post.getTitle() }}</td>
-            <td>{{ post.getAuthorName() }}</td>
-            <td><a href="{{ post.getId }}"></a>
-                <button>Ukryj</button>
-            </td>
+        <td><img src="{{ post.getFilename() }}" class="thumbnail"></td>
+        <td>{{ post.getTimestamp() }}</td>
+        <td>{{ post.getTitle() }}</td> 
+        <td>{{ post.getAuthorName() }}</td>
+        <td><a href="admin/remove/{{ post.getId() }}">
+            <button>Ukryj</button>
+        </a></td>
         </tr>
-        {% endforeach %}
-    </ul>
+    {% endfor %}
+    </table>
 </div>
 {% include 'footer.html.twig' %}

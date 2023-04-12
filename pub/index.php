@@ -26,7 +26,7 @@ Route::add('/upload', function() {
         $twigData['user'] = $_SESSION['user'];
         $twig->display("upload.html.twig", $twigData);
     } else {
-        header('HTTP/1.0 403 Forbidden');
+        http_response_code(403);
     }
         
 });
@@ -69,7 +69,7 @@ Route::add('/login', function() {
             header("Location: http://localhost/projekt2/pub");
         } else {
             $twigData = array("pageTitle" => "Zaloguj użytkownika",
-                                "message" => "Nieprawidłowy użytkownik lub hasło");
+                                "message" => "Niepoprawny użytkownik lub hasło");
             $twig->display("login.html.twig", $twigData);
         }
     }
@@ -80,7 +80,7 @@ Route::add('/login', function() {
 Route::add('/admin', function() {
     global $twig;
     if(User::isAuth()) {
-        $postList = Post::getPage(1, 100);
+        $postsList = Post::getPage(1, 100);
         $twigData = array("postList" => "postList");
         $twig->display("admin.html.twig", $twigData);
     } else {
