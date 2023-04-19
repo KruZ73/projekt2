@@ -1,6 +1,6 @@
 {% include 'header.html.twig' %}
 <div id="pageContainer">
-    <h1>{{ pageTitle|default("Brak tytułu podstrony")}}</h1>
+    <h1>Zaloguj</h1>
     <form action="" method="post">
         <label for="emailInput">Podaj adres e-mail:</label>
         <input type="email" name="email" id="emailInput"><br>
@@ -9,8 +9,7 @@
         <input type="submit" name="submit" value="Zaloguj">
     </form>
     {% if message is defined %}
-    <span class="message">{{ message }}</span>
+        <span class="message">{{message}}</span>
     {% endif %}
 </div>
-
 {% include 'footer.html.twig' %}

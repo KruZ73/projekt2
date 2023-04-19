@@ -19,17 +19,6 @@ class User {
     public function getName() : string {
         return $this->email;
     }
-
-    public static function isAuth() : bool {
-        if(isset($_SESSION['user'])) {
-            if($_SESSION['user'] instanceof User) {
-                return true;
-            }
-        }
-    }
-
-
-
     //pobieranie nazwy użytkownika według jego id - potrzebne do wyświetlania autorów postów
     public static function getNameById(int $userId) : string {
         global $db;
@@ -55,12 +44,10 @@ class User {
         $query->bind_param('s', $email);
         $query->execute();
         $result = $query->get_result();
-        
-        //jeśli nie ma takiego konta zwróć false
-        if($result->num_rows == 0)
-            return false;
-
         $row = $result->fetch_assoc();
+        if ($result->num_rows == 0) {
+            return false;
+        }
         $passwordHash = $row['password'];
         //jeżeli autoryzacja się powiedzie to zapisz użytkownika jako obiekt w sesji
         if(password_verify($password, $passwordHash)) {
@@ -72,6 +59,14 @@ class User {
             return false;
         }
     }
-}
 
+    public static function isAuth() : bool {
+        if (isset($_SESSION['user'])) {
+            if ($_SESSION['user'] instanceof User) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
 ?>

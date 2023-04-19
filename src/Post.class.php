@@ -2,139 +2,128 @@
 class Post {
     private int $id;
     private string $title;
-    private string $filename;
-    private string $timestamp;
-    //id użytkownika który wgrał mema
+    private string $imageUrl;
+    private string $timeStamp;
     private int $authorId;
-    //nazwa użytkownika autora mema
     private string $authorName;
-    
 
-    function __construct(int $i, string $f, string $t, string $title, int $authorId) {
+    function __construct(int $i, string $imageUrl, string $timeStamp, string $title, int $authorId) {
         $this->id = $i;
-        $this->filename = $f;
-        $this->timestamp = $t;
+        $this->imageUrl = $imageUrl;
+        $this->timeStamp = $timeStamp;
         $this->title = $title;
         $this->authorId = $authorId;
-        //pobierz z bazy danych imię / login autora posta
         global $db;
         $this->authorName = User::getNameById($this->authorId);
+
     }
-    //gettery 
-    public function getTitle() : string {
+
+    public function getFilename() {
+        return $this->imageUrl;
+    }
+
+    public function getTitle() {
         return $this->title;
     }
-    public function getFilename() : string {
-        return $this->filename;
+
+    public function getTimestamp() {
+        return $this->timeStamp;
     }
-    public function getTimestamp() : string {
-        return $this->timestamp;
-    }
-    public function getAuthorName() : string {
+    public function getAuthorName() {
         return $this->authorName;
     }
-    public function getId() : string {
+
+    // static function get(int $id) : Post {
+    //     global $db;
+
+    //     $q = $db->prepare("SELECT * FROM post WHERE id = ?");
+    //     $q->bind_param('i', $id);
+    //     $q->execute();
+    //     $result = $q->get_result();
+    //     $resultArray = $result->fetch_array();
+    //     return new Post($resultArray['title'], $resultArray['filename'], $result['timestamp']);
+    // }
+    public function getId() {
         return $this->id;
     }
 
-    //funkcja zwraca ostatnio dodany obrazek
     static function getLast() : Post {
-        //odwołuję się do bazy danych
         global $db;
-        //Przygotuj kwerendę do bazy danych
         $query = $db->prepare("SELECT * FROM post ORDER BY timestamp DESC LIMIT 1");
-        //wykonaj kwerendę
         $query->execute();
-        //pobierz wynik
         $result = $query->get_result();
-        //przetwarzanie na tablicę asocjacyjną - bez pętli bo będzie tylko jeden
         $row = $result->fetch_assoc();
-        //tworzenie obiektu
-        $p = new Post($row['id'], $row['filename'], $row['timestamp'], $row['title'], $row['userId']);
-        //zwracanie obiektu
-        return $p; 
+        $p = new Post($row['id'], $row['filename'], $row['timestamp'], $row['title'], (int)$row['userId']);
+        return $p;
     }
 
-    //funkcja zwraca jedna stronę obrazków
     static function getPage(int $pageNumber = 1, int $postsPerPage = 10) : array {
-        //połączenie z bazą
         global $db;
-        //kwerenda
-        $query = $db->prepare("SELECT * FROM post ORDER BY timestamp DESC LIMIT ? OFFSET ?");
-        //oblicz przesunięcie - numer strony * ilość zdjęć na stronie
-        $offset = ($pageNumber-1)*$postsPerPage;
-        //podstaw do kwerendy
-        $query->bind_param('ii', $postsPerPage, $offset);
-        //wywołaj kwerendę
-        $query->execute();
-        //odbierz wyniki
-        $result = $query->get_result();
-        //stwórz tablicę na obiekty
-        $postsArray = array();
-        //pobieraj wiersz po wierszu jako tablicę asocjacyjną indeksowaną nazwami kolumn z mysql
-        while($row = $result->fetch_assoc()) {
-            $post = new Post($row['id'],$row['filename'],$row['timestamp'], $row['title'], $row['userId']);
-            array_push($postsArray, $post);
+
+        $q = $db->prepare("SELECT * FROM post WHERE removed = false ORDER BY timestamp DESC LIMIT ? OFFSET ?");
+        $offset = ($pageNumber -1) * $postsPerPage;
+        $q->bind_param('ii', $postsPerPage, $offset);
+        $q->execute();
+        $result = $q->get_result();
+        $postArray = array();
+        while($row = $result->fetch_array()) {
+        global $db;
+            $post = new Post($row['id'], $row['filename'], $row['timestamp'], $row['title'], $row['userId']);
+            array_push($postArray, $post);
         }
-        return $postsArray;
+        return $postArray;
     }
 
-    static function upload(string $tempFileName, string $title, int $userId) {
-        //deklarujemy folder do którego będą zaczytywane obrazy
+    static function upload(string $tempFileName, string $title = "", int $userId) {
         $targetDir = "img/";
-        //sprawdź czy mamy do czynienia z obrazem
-        $imgInfo = getimagesize($tempFileName);
-        //jeżeli $imgInfo nie jest tablicą to nie jest to obraz
-        if(!is_array($imgInfo)) {
-            die("BŁĄD: Przekazany plik nie jest obrazem!");
+
+        $imageInfo = getimagesize($tempFileName);
+            
+        if (!is_array($imageInfo)) {
+            die("BŁĄD: Nieprawidłowy format obrazu");
         }
-        //generujemy losową liczbę w formie
-        //5 losowych cyfr + znacznik czasu z dokładnością do ms
-        $randomNumber = rand(10000, 99999) . hrtime(true);
-        //wygeneruj hash - nową nazwę pliku
-        $hash = hash("sha256", $randomNumber);
-        //tworzymy docelowy url pliku graficznego na serwerze
-        $newFileName = $targetDir . $hash . ".webp";
-        //sprawdź czy plik przypadkiem już nie istnieje
-        if(file_exists($newFileName)) {
-            die("BŁĄD: Podany plik już istnieje!");
+        $randomSeed = rand(10000,99999) . hrtime(true);
+        $hash = hash("sha256", $randomSeed);
+
+        $targetFileName = $targetDir . $hash . ".webp";
+        if(file_exists($targetFileName)) {
+            die("BŁĄD: Plik o tej nazwie już istnieje");
         }
-        //zaczytujemy cały obraz z folderu tymczasowego do stringa
+
         $imageString = file_get_contents($tempFileName);
-        //generujemy obraz jako obiekt klasy GDImage
-        //@ przed nazwa funkcji powoduje zignorowanie ostrzeżeń
 
-
-        // błąd tu jest jakiś?????
         $gdImage = @imagecreatefromstring($imageString);
-        
-        
-        //zapisujemy w formacie webp
-        imagewebp($gdImage, $newFileName);
 
-        //użyj globalnego połączenia
+        imagewebp($gdImage, $targetFileName);
+
         global $db;
-        //stwórz kwerendę
-        $query = $db->prepare("INSERT INTO post VALUES(NULL, ?, ?, ?, ?)");
-        //przygotuj znacznik czasu dla bazy danych
-        $dbTimestamp = date("Y-m-d H:i:s");
-        //zapisz dane do bazy
-        $query->bind_param("sssi", $dbTimestamp, $newFileName, $title, $userId);
-        if(!$query->execute())
-            die("Błąd zapisu do bazy danych");
 
+        $q = "INSERT post (id, timestamp, filename, ip, title, userId, removed) VALUES (NULL, ?, ?, ?, ?, ?, false)";
+        $preparedQ = $db->prepare($q);
+
+        $date = date('Y-m-d H:i:s');
+        $preparedQ->bind_param('ssssi', $date, $targetFileName, $_SERVER['REMOTE_ADDR'], $title, $userId); //////////////////////////
+        $result = $preparedQ->execute();
+        if (!$result) {
+            die("Błąd bazy danych");
+        }
     }
 
-    public static function remove(int $id) : bool {
+    static function remove(int $id) : bool {
         global $db;
-        $query = $db->prepare("UPDATE post SET removed = true WHERE id = ?");
-        $query->bind_param('i', $id);
-        if($query->execute())
+        $q = $db->prepare("UPDATE post SET removed = true WHERE id = ?");
+        $q->bind_param('i', $id);
+        if ($q->execute()) {
             return true;
-        else
+        } else {
             return false;
+        }
+    }
+
+    public function getLikes() {
+        $likes = Likes::getLikes($this->getId());
+        return $likes;
     }
 }
-
 
 ?>

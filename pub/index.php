@@ -1,45 +1,42 @@
 <?php
 require("./../src/config.php");
 session_start();
+
 use Steampixel\Route;
 
 Route::add('/', function() {
-    //strona wyświetlająca obrazki
     global $twig;
-    //pobierz 10 najnowszych postów
-    $postArray = Post::getPage();
-    $twigData = array("postArray" => $postArray,
-                        "pageTitle" => "Strona główna",
-                        );
-    //jeśli użytkownik jest zalogowany to przekaż go do twiga
-    if(isset($_SESSION['user']))
-        $twigData['user'] = $_SESSION['user'];
-    $twig->display("index.html.twig", $twigData);
+    
+    $posts = Post::getPage();
+    $t = array("posts" => $posts);
+    if(isset($_SESSION['user'])) {
+        $t['user'] = $_SESSION['user'];
+    }
+    
+    $twig->display("index.html.twig", $t);
 });
 
 Route::add('/upload', function() {
-    //strona z formularzem do wgrywania obrazków
     global $twig;
-    $twigData = array("pageTitle" => "Wgraj mema");
-    //jeśli użytkownik jest zalogowany to przekaż go do twiga
+
     if(User::isAuth()) {
-        $twigData['user'] = $_SESSION['user'];
-        $twig->display("upload.html.twig", $twigData);
+        $t['user'] = $_SESSION['user'];
+        $twig->display("upload.html.twig", $t);
     } else {
         http_response_code(403);
     }
-        
 });
 
 Route::add('/upload', function() {
-    //wywoła się tylko po otrzymaniu danych metodą post na ten url
-    // (po wypełnieniu formularza)
     global $twig;
-    if(isset($_POST['submit']))  {
-        Post::upload($_FILES['uploadedFile']['tmp_name'], $_POST['title'], $_POST['userId']);
-    }
-    //TODO: zmienić na ścieżkę względną
-    header("Location: http://localhost/projekt2/pub");
+
+    $tempFileName = $_FILES['uploadedFile']['tmp_name'];
+    $title = $_POST['title'];
+    Post::upload($tempFileName, $title, $_POST['userId']); //////////////////////////
+
+    // $twig->display("index.html");
+    header('Location: /projekt2/pub');
+    die();
 }, 'post');
 
 Route::add('/register', function() {
@@ -52,7 +49,7 @@ Route::add('/register', function(){
     global $twig;
     if(isset($_POST['submit'])) {
         User::register($_POST['email'], $_POST['password']);
-        header("Location: http://localhost/projekt2/pub");
+        header("Location: /projekt2/pub");
     }
 }, 'post');
 
@@ -65,39 +62,55 @@ Route::add('/login', function(){
 Route::add('/login', function() {
     global $twig;
     if(isset($_POST['submit'])) {
-        if(User::login($_POST['email'], $_POST['password'])) {
-            header("Location: http://localhost/projekt2/pub");
+        if (User::login($_POST['email'], $_POST['password'])) {
+            header("Location: /projekt2/pub");
         } else {
-            $twigData = array("pageTitle" => "Zaloguj użytkownika",
-                                "message" => "Niepoprawny użytkownik lub hasło");
-            $twig->display("login.html.twig", $twigData);
+            $t = array("message" => "Nieprawidłowy użytkownik lub hasło");
+            $twig->display("login.html.twig", $t);
         }
     }
-    
 
 }, 'post');
 
 Route::add('/admin', function() {
     global $twig;
     if(User::isAuth()) {
-        $postsList = Post::getPage(1, 100);
-        $twigData = array("postList" => "postList");
-        $twig->display("admin.html.twig", $twigData);
+        $t = array( "postList" => Post::getPage(1, 100));
+        $twig->display("admin.html.twig", $t);
+
     } else {
         http_response_code(403);
     }
 });
-
 
 Route::add('/admin/remove/([0-9]*)', function($id) {
     if(User::isAuth()) {
         Post::remove($id);
-        header("Location: http://localhost/projekt2/admin");
+        header("Location: /projekt2/pub/admin");
     } else {
         http_response_code(403);
     }
 });
 
-Route::run('/projekt2/pub');
+Route::add('/like/([0-9]*)', function($post_id) {
+    if(!User::isAuth()) {
+        http_response_code(403);
+    } else {
+        $user_id = $_SESSION['user']->getId();
+        $like = new Likes($post_id, $user_id, 1);
+        header("Location: /projekt2/pub");
+    }
+});
 
+Route::add('/dislike/([0-9]*)', function($post_id) {
+    if(!User::isAuth()) {
+        http_response_code(403);
+    } else {
+        $user_id = $_SESSION['user']->getId();
+        $like = new Likes($post_id, $user_id, -1);
+        header("Location: /projekt2/pub");
+    }
+});
+
+Route::run('/projekt2/pub'); //////////////////////////
 ?>
