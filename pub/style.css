@@ -1,14 +1,4 @@
-h1 {
-    text-align: center;
-}
-article.post {
-    width: 50vw;
-    margin: 0 auto;
-    background-color: rgb(255, 139, 139);
-    padding: 4vh 2vw;
-    margin-bottom: 2rem;
-}
-article.post img {
-    width: 100%;
+body {
+    background-color: salmon;
 }
 
