@@ -1,4 +1,9 @@
-body {
-    background-color: salmon;
+.upl {
+    text-decoration: none;
+    font-size: 300px;
 }
 
+.post {
+    width: 300px;
+    height: 300px;
+}

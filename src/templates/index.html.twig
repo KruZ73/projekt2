@@ -8,7 +8,7 @@
     <div id="loggedUser">Zalogowany użytkownik: {{ user.getName() }} </div>
     {% endif %}
 </div>
-<a href="upload">Wgraj mema</a>
+<a href="upload" class="upl">Wgraj mema</a>
 <br><br>
 {% for post in posts %}
 
@@ -24,7 +24,8 @@
         Autor: {{post.getAuthorName() }}<br>
         {{ post.getTimestamp() }}<br>
     </div>
-<img class='img' src="{{ post.getFilename() }}"><br></div>
+    <img class='img' src="{{ post.getFilename() }}"><br>
+</div>
 {% endfor %}
 
 {%include 'footer.html.twig'%}
