@@ -1,0 +1,21 @@
+.naglowek {
+    text-align: center;
+}
+
+.upl {
+    text-decoration: none;
+    font-size: 30px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+
+}
+
+.post {
+    margin-top: 100px;
+    margin-left: 20%;
+    width: 300px;
+    height: auto;
+    border: 4px solid greenyellow;
+}
+body {
+    background-color: salmon;
+}
