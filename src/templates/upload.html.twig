@@ -4,9 +4,9 @@
     <div id="loggedUser">Zalogowany użytkownik: {{ user.getName() }} </div>
     {% endif %}
     <form action="" method="post" enctype="multipart/form-data">
-        <label for="titleInput">Tytuł obrazka</label>
+        <label class="log" for="titleInput">Tytuł obrazka</label>
         <input type="text" name="title" id="titleInput"><br>
-        <label for="uploadedfileinput">
+        <label class="log" for="uploadedfileinput">
             Wybierz plik do wgrania na serwer:
         </label><br>
         {% if user is defined %}
