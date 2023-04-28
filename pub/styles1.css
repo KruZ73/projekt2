@@ -1,5 +1,6 @@
 .naglowek {
     text-align: center;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
 
 .upl {
@@ -14,8 +15,23 @@
     margin-left: 20%;
     width: 300px;
     height: auto;
-    border: 4px solid greenyellow;
+    border: 7px solid greenyellow;
 }
 body {
     background-color: salmon;
+}
+
+#loggedUser {
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  font-weight: bolder;
+}
+
+.ft {
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  font-weight: bolder;
+}
+
+.log {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  font-weight: bolder;
 }
